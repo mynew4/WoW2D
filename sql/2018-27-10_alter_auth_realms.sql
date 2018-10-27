@@ -1,0 +1,1 @@
+ALTER TABLE `wow2d_auth`.`auth_realms` CHANGE `realm_id` `realm_id` INT(11) NOT NULL AUTO_INCREMENT;

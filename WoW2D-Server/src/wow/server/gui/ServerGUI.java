@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import wow.server.gui.commands.CommandAccountCreate;
 import wow.server.gui.commands.CommandAccountSetLevel;
+import wow.server.gui.commands.CommandRealmCreate;
 import wow.server.gui.commands.ICommand;
 import wow.server.net.WoWServer;
 
@@ -38,6 +39,7 @@ public class ServerGUI {
 	 */
 	static {
 		commands.add(new CommandAccountCreate());
+		commands.add(new CommandRealmCreate());
 		commands.add(new CommandAccountSetLevel());
 	}
 	
