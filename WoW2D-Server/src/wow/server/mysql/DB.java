@@ -368,6 +368,40 @@ public class DB {
 	}
 	
 	/**
+	 * Attempt to create an account.
+	 * @param realm_name
+	 * @param realm_port
+	 * @return true if success, false otherwise
+	 */
+	
+	public static boolean createRealm(int realm_id, String realm_name, int realm_port)
+	{
+		if (!doesRealmExist(realm_name))
+		{
+			String query = String.format("INSERT INTO auth_realms (realm_id, realm_name, realm_port) VALUES (?, ?, ?)");
+			PreparedStatement statement = null;
+			try {
+				AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
+				statement = AuthenticationConnection.prepareStatement(query);
+				
+				statement.setInt(1, realm_id);
+				statement.setString(2, realm_name);
+				statement.setInt(3, realm_port);
+				statement.execute();
+				
+				return true;
+			} catch (SQLException ex) {
+				System.err.println(String.format("Unable to create realm: %s", ex.getMessage()));
+			} finally {
+				closeQuietly(statement);
+				closeQuietly();
+			}
+			return false;
+		}
+		return false;
+	}
+	
+	/**
 	 * Attempt to set the level of an account.
 	 * @param username
 	 * @param level
@@ -423,6 +457,40 @@ public class DB {
 		} catch (SQLException ex) {
 			System.err.println(String.format("Unable to check account existence: %s", ex.getMessage()));
 		} finally {
+			closeQuietly(resultSet);
+			closeQuietly(statement);
+			closeQuietly();
+		}
+		return false;
+	}
+	
+	/**
+	 * Does a realm exist? If so, return a new temporary connection.
+	 * @param realm_name
+	 * @return a temporary connection
+	 */
+	
+	private static boolean doesRealmExist(String realm_name)
+	{
+		String query = String.format("SELECT realm_name FROM auth_realms WHERE realm_name='%s'", realm_name);
+		Statement statement = null;
+		ResultSet resultSet = null;
+		
+		try {
+			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
+			
+			statement = AuthenticationConnection.createStatement();
+			resultSet = statement.executeQuery(query);
+			
+			if (resultSet.next()) {
+				return true;
+			}
+			return false;
+		}
+		catch (SQLException ex) {
+			System.err.println(String.format("Unable to check realm existence: %s", ex.getMessage()));
+		}
+		finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
 			closeQuietly();
