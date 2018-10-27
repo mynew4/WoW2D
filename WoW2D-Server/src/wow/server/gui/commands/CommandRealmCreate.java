@@ -19,10 +19,12 @@ public class CommandRealmCreate extends ICommand {
 	@Override
 	public void performCommand(String args) {
 		String[] arguments = args.split(" ");
-		String realm_name = arguments[2].toUpperCase();
-		int realm_port = Integer.parseInt(arguments[3]);
 		
-		if (DB.createRealm(realm_name, realm_port)) {
+		int realm_id = Integer.parseInt(arguments[2]);
+		String realm_name = arguments[3].toUpperCase();
+		int realm_port = Integer.parseInt(arguments[4]);
+		
+		if (DB.createRealm(realm_id, realm_name, realm_port)) {
 			WoWServer.writeMessage(LogType.Logon, "Realm created: " + realm_name);
 		} else {
 			WoWServer.writeMessage(LogType.Logon, "Unable to create realm: " + realm_name);

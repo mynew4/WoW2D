@@ -374,18 +374,19 @@ public class DB {
 	 * @return true if success, false otherwise
 	 */
 	
-	public static boolean createRealm(String realm_name, int realm_port)
+	public static boolean createRealm(int realm_id, String realm_name, int realm_port)
 	{
 		if (!doesRealmExist(realm_name))
 		{
-			String query = String.format("INSERT INTO auth_realms (realm_name, realm_port) VALUES (?, ?)");
+			String query = String.format("INSERT INTO auth_realms (realm_id, realm_name, realm_port) VALUES (?, ?, ?)");
 			PreparedStatement statement = null;
 			try {
 				AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
 				statement = AuthenticationConnection.prepareStatement(query);
 				
-				statement.setString(1, realm_name);
-				statement.setInt(2, realm_port);
+				statement.setInt(1, realm_id);
+				statement.setString(2, realm_name);
+				statement.setInt(3, realm_port);
 				statement.execute();
 				
 				return true;
