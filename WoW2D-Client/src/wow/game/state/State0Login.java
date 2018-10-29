@@ -1,5 +1,7 @@
 package wow.game.state;
 
+import java.util.Date;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -78,8 +80,8 @@ public class State0Login extends BasicGameState {
 		graphics.setColor(Color.yellow);
 		graphics.drawString(label_AccountName, container.getWidth() / 2 - graphics.getFont().getWidth(label_AccountName) / 2, container.getHeight() / 2 - 75 - graphics.getFont().getHeight(label_AccountName) / 2);
 		graphics.drawString(label_AccountPassword, container.getWidth() / 2 - graphics.getFont().getWidth(label_AccountPassword) / 2, container.getHeight() / 2 - graphics.getFont().getHeight(label_AccountPassword) / 2);
-		graphics.drawString(String.format("Version %s (Build 4) (dev-Alpha)", WoW.getVersion()), 0, container.getHeight() - (graphics.getFont().getLineHeight() * 2));
-		graphics.drawString("Oct 19 2018", 0, container.getHeight() - graphics.getFont().getLineHeight());
+		graphics.drawString(String.format("Version %s (Build 6) (dev-Alpha)", WoW.getVersion()), 0, container.getHeight() - (graphics.getFont().getLineHeight() * 2));
+		graphics.drawString("Oct 29 2018", 0, container.getHeight() - graphics.getFont().getLineHeight());
 		graphics.drawString(label_Copyright, container.getWidth() / 2 - graphics.getFont().getWidth(label_Copyright) / 2, container.getHeight() - graphics.getFont().getLineHeight() * 2);
 		graphics.drawString(label_BlizzCopyright, container.getWidth() / 2 - graphics.getFont().getWidth(label_BlizzCopyright) / 2, container.getHeight() - graphics.getFont().getLineHeight());
 		

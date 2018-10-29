@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2018-10-26 13:35:13
+Date: 2018-10-29 15:26:16
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -20,20 +20,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `auth_banned_names`;
 CREATE TABLE `auth_banned_names` (
-  `user_name` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for auth_characters
--- ----------------------------
-DROP TABLE IF EXISTS `auth_characters`;
-CREATE TABLE `auth_characters` (
-  `user_id` int(11) NOT NULL,
-  `realm_id` int(11) DEFAULT NULL,
-  `user_name` varchar(16) DEFAULT NULL,
-  `x_position` float(255,0) DEFAULT NULL,
-  `y_position` float(255,0) DEFAULT NULL,
-  `direction` int(11) DEFAULT NULL
+  `character_name` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------

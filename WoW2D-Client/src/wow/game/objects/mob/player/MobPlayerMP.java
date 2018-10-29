@@ -41,6 +41,14 @@ public class MobPlayerMP extends IMobPlayer {
 				race.getEastAnimation().draw(x, y);
 			} else if (direction == Direction.WEST) {
 				race.getWestAnimation().draw(x, y);
+			} else if (direction == Direction.NORTH_EAST) {
+				race.getNorthAnimation().draw(x, y);
+			} else if (direction == Direction.SOUTH_EAST) {
+				race.getSouthAnimation().draw(x, y);
+			} else if (direction == Direction.SOUTH_WEST) {
+				race.getSouthAnimation().draw(x, y);
+			} else if (direction == Direction.NORTH_WEST) {
+				race.getNorthAnimation().draw(x, y);
 			}
 		} else {
 			if (direction == Direction.NORTH) {
@@ -51,7 +59,16 @@ public class MobPlayerMP extends IMobPlayer {
 				race.getEastIdleSprite().draw(x, y);
 			} else if (direction == Direction.WEST) {
 				race.getWestIdleSprite().draw(x, y);
+			} else if (direction == Direction.NORTH_EAST) {
+				race.getNorthIdleSprite().draw(x, y);
+			} else if (direction == Direction.SOUTH_EAST) {
+				race.getSouthIdleSprite().draw(x, y);
+			} else if (direction == Direction.SOUTH_WEST) {
+				race.getSouthIdleSprite().draw(x, y);
+			} else if (direction == Direction.NORTH_WEST) {
+				race.getNorthIdleSprite().draw(x, y);
 			}
+			
 		}
 		
 		if (SettingsConfiguration.shouldRenderPlayerNames()) {
@@ -74,6 +91,14 @@ public class MobPlayerMP extends IMobPlayer {
 				race.getEastAnimation().update(delta);
 			} else if (direction == Direction.WEST) {
 				race.getWestAnimation().update(delta);
+			} else if (direction == Direction.NORTH_EAST) {
+				race.getNorthAnimation().update(delta);
+			} else if (direction == Direction.SOUTH_EAST) {
+				race.getSouthAnimation().update(delta);
+			} else if (direction == Direction.SOUTH_WEST) {
+				race.getSouthAnimation().update(delta);
+			} else if (direction == Direction.NORTH_WEST) {
+				race.getNorthAnimation().update(delta);
 			}
 		}
 		if (bounds != null) {

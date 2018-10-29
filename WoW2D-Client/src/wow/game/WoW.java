@@ -39,7 +39,7 @@ public class WoW extends StateBasedGame {
 	public static final int Width = 1280;
 	public static final int Height = 720;
 	
-	private static final String Version = "a5.0.0";
+	private static final String Version = "a6.0.0";
 	private static final String Title = String.format("World of Warcraft 2D (%s)", Version);
 	
 	private static AngelCodeFont SmallerFont;

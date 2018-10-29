@@ -16,11 +16,12 @@ import wow.net.packet.logon.PacketLogin;
 import wow.net.packet.logon.PacketRealmRequest;
 import wow.net.packet.logon.PacketWorldRequest;
 import wow.net.packet.world.PacketChatMessage;
-import wow.net.packet.world.PacketMovement;
+import wow.net.packet.world.PacketMovement_C;
 import wow.net.packet.world.PacketPlayerList;
 import wow.net.packet.world.PacketPlayerListRequest;
 import wow.net.packet.world.PacketWorldDisconnectToAll;
 import wow.net.packet.world.PacketWorldEnterRequest;
+import wow.net.util.Logger;
 import wow.net.util.PlayerList;
 import wow.server.gui.ServerGUI;
 import wow.server.gui.ServerGUI.LogType;
@@ -38,7 +39,6 @@ import wow.server.net.packet.handler.logon.PacketHandlerWorldRequest;
 import wow.server.net.packet.handler.world.PacketHandlerChat;
 import wow.server.net.packet.handler.world.PacketHandlerMovement;
 import wow.server.net.packet.handler.world.PacketHandlerWorldEnterRequest;
-import wow.server.system.ScriptSystem;
 import wow.server.util.ServerConfiguration;
 import wow.server.util.Vector2f;
 import wow.server.util.manager.EntityManager;
@@ -50,7 +50,7 @@ import wow.server.util.manager.EntityManager;
  */
 public class WoWServer {
 	
-	public static String VERSION = "a5.0.0";
+	public static String VERSION = "a6.0.0";
 	
 	/* Used in authentication */
 	public static String STATIC_SALT = "wow_2dimensions";
@@ -82,7 +82,8 @@ public class WoWServer {
 		AdministratorCommands.add(new CommandGObject());
 	}
 	
-	public WoWServer() {		
+	public WoWServer() {	
+		Logger.newServerInstance();
 		ServerConfiguration.newInstance();
 		DB.newInstance();
 		BannedNames = DB.loadBannedNames();
@@ -201,8 +202,8 @@ public class WoWServer {
 					sendPlayerList(connection.getID());
 				}
 				
-				if (object instanceof PacketMovement) {
-					PacketHandlerMovement pHandlerMovement = new PacketHandlerMovement((PacketMovement)object);
+				if (object instanceof PacketMovement_C) {
+					PacketHandlerMovement pHandlerMovement = new PacketHandlerMovement((PacketMovement_C)object);
 					pHandlerMovement.handlePacket(worldServer, connection);
 				}
 				

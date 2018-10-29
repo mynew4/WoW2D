@@ -19,7 +19,11 @@ public abstract class IMobPlayer {
 		NORTH(0),
 		SOUTH(1),
 		EAST(2),
-		WEST(3);
+		WEST(3),
+		NORTH_EAST(4),
+		SOUTH_EAST(5),
+		SOUTH_WEST(6),
+		NORTH_WEST(7);
 		
 		private int direction;
 		
@@ -36,7 +40,6 @@ public abstract class IMobPlayer {
 	protected IRace race;
 	
 	protected float x, y;
-	protected float velX, velY;
 	
 	protected boolean isMovingUp, isMovingDown, isMovingLeft, isMovingRight;
 	protected Direction direction;

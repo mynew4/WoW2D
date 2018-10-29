@@ -58,8 +58,8 @@ public class NetworkManager {
 		worldConnection.sendChat(text);
 	}
 	
-	public static void sendMovement(float x, float y, int direction, boolean isMoving) {
-		worldConnection.sendMovement(x, y, direction, isMoving);
+	public static void sendMovement(int direction, boolean isMoving) {
+		worldConnection.sendMovement(direction, isMoving);
 	}
 	
 	public static void addPlayer(PlayerCharacterMP character) {
@@ -127,6 +127,10 @@ public class NetworkManager {
 			EntityManager.updateInstancePosition(entityId, entityInstanceId, x, y, direction);
 			break;
 		}
+	}
+	
+	public static void handleLocalMovement(float x, float y) {
+		player.setNetworkPosition(x, y);
 	}
 	
 	public static void disconnectLogon() {

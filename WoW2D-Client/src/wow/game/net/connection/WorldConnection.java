@@ -16,8 +16,9 @@ import wow.net.packet.world.PacketChatMessage;
 import wow.net.packet.world.PacketChatMessageToAll;
 import wow.net.packet.world.PacketGMUpdate;
 import wow.net.packet.world.PacketGObject;
-import wow.net.packet.world.PacketMovement;
 import wow.net.packet.world.PacketMovementToAll;
+import wow.net.packet.world.PacketMovement_C;
+import wow.net.packet.world.PacketMovement_S;
 import wow.net.packet.world.PacketPlayerList;
 import wow.net.packet.world.PacketPlayerListRequest;
 import wow.net.packet.world.PacketWorldDisconnectToAll;
@@ -102,6 +103,10 @@ public class WorldConnection {
 					PacketWorldDisconnectToAll pDisconnectAll = (PacketWorldDisconnectToAll)object;
 					String characterName = pDisconnectAll.CharacterName;
 					NetworkManager.disconnectPlayer(characterName);
+				} else if (object instanceof PacketMovement_S) {
+					float x = ((PacketMovement_S)object).X;
+					float y = ((PacketMovement_S)object).Y;
+					NetworkManager.handleLocalMovement(x, y);
 				} else if (object instanceof PacketMovementToAll) {
 					String characterName = ((PacketMovementToAll)object).CharacterName;
 					float x = ((PacketMovementToAll)object).X;
@@ -132,10 +137,8 @@ public class WorldConnection {
 	 * @param direction
 	 * @param isMoving
 	 */
-	public void sendMovement(float x, float y, int direction, boolean isMoving) {
-		PacketMovement pMovement = new PacketMovement();
-		pMovement.X = x;
-		pMovement.Y = y;
+	public void sendMovement(int direction, boolean isMoving) {
+		PacketMovement_C pMovement = new PacketMovement_C();
 		pMovement.Direction = direction;
 		pMovement.isMoving = isMoving;
 		client.sendUDP(pMovement);

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import wow.net.util.Logger;
+
 /**
  * A class to handle the server's configuration.
  * @author Xolitude (October 26, 2018)
@@ -28,6 +30,7 @@ public class ServerConfiguration {
 		DB_PASS("db_pass"),
 		DB_AUTH("db_auth"),
 		DB_WORLD("db_world"),
+		DB_CHAR("db_chars"),
 		DB_HOST("db_host"),
 		DB_PORT("db_port"),
 		USE_SSL("use_ssl");
@@ -59,19 +62,38 @@ public class ServerConfiguration {
 				if (!line.contains("=")) // TODO: more configs (check config file)
 					continue;
 				String[] settingSplitter = line.split("=");
-				String key = settingSplitter[0];
-				String value = settingSplitter[1];
-				
-				for (Keys k : Keys.values()) {
-					if (k.keyName.equalsIgnoreCase(key)) {
-						keyValues.put(k.keyName, value);
+				loadSetting(settingSplitter);
+			}
+		} catch (FileNotFoundException e) {
+			Logger.write("Unable to find the server configuration file. Please obtain a fresh copy of the server.");
+		} catch (IOException e) {
+			Logger.write(String.format("An I/O exception occured in class: %s - exception message: %s", ServerConfiguration.class.getName(), e.getMessage()));
+		}
+	}
+	
+	private static void loadSetting(String[] settingVals) {
+		String key = null;
+		String value = null;
+		try {
+			key = settingVals[0];
+			value = settingVals[1];
+			
+			for (Keys k : Keys.values()) {
+				if (k.keyName.equalsIgnoreCase(key)) {
+					keyValues.put(k.keyName, value);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			if (key != null) {
+				if (value == null) {
+					Logger.write(String.format("!! The value of '%s' is null. Unexpected crashes or errors may result. !!", key));
+					for (Keys k : Keys.values()) {
+						if (k.keyName.equalsIgnoreCase(key)) {
+							keyValues.put(k.keyName, "");
+						}
 					}
 				}
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -150,7 +172,7 @@ public class ServerConfiguration {
 				return keyvalues.getValue();
 			}
 		}
-		return null;
+		return "";
 	}
 	
 	/**
@@ -173,6 +195,19 @@ public class ServerConfiguration {
 	public static String getWorldDatabase() {
 		for (Map.Entry<String, String> keyvalues : keyValues.entrySet()) {
 			if (keyvalues.getKey().equalsIgnoreCase("db_world")) {
+				return keyvalues.getValue();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Get the character database name.
+	 * @return the database name.
+	 */
+	public static String getCharacterDatabase() {
+		for (Map.Entry<String, String> keyvalues : keyValues.entrySet()) {
+			if (keyvalues.getKey().equalsIgnoreCase("db_chars")) {
 				return keyvalues.getValue();
 			}
 		}

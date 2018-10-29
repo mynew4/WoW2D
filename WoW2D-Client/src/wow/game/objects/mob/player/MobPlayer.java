@@ -54,6 +54,18 @@ public class MobPlayer extends IMobPlayer {
 			case WEST:
 				race.getWestIdleSprite().draw(x, y);
 				break;
+			case NORTH_EAST:
+				race.getNorthIdleSprite().draw(x, y);
+				break;
+			case SOUTH_EAST:
+				race.getSouthIdleSprite().draw(x, y);
+				break;
+			case SOUTH_WEST:
+				race.getSouthIdleSprite().draw(x, y);
+				break;
+			case NORTH_WEST:
+				race.getNorthIdleSprite().draw(x, y);
+				break;
 			}
 		}
 		
@@ -70,63 +82,54 @@ public class MobPlayer extends IMobPlayer {
 	public void update(GameContainer container, StateBasedGame sbg, int delta) throws SlickException {
 		controller.update(container, sbg);
 		
-		if (isMovingDown) {
-			velY += 0.1f * delta;
-			if (velY > 1.2f)
-				velY = 1.2f;
-			direction = Direction.SOUTH;
-			race.getSouthAnimation().update(delta);
-			if (race.getNorthAnimation().getFrame() != 0) {
-				race.getNorthAnimation().restart();
-			}
-		} else if (isMovingUp) {
-			velY += -(0.1f) * delta;
-			if (velY < -1.2f)
-				velY = -1.2f;
+		if (isMovingUp) {
 			direction = Direction.NORTH;
-			race.getNorthAnimation().update(delta);
-			if (race.getSouthAnimation().getFrame() != 0) {
-				race.getSouthAnimation().restart();
-			}
-		} else {
-			velY = 0;
 		}
 		
 		if (isMovingRight) {
-			velX += 0.1f * delta;
-			if (velX > 1.2f)
-				velX = 1.2f;
-			if (!isMovingUp || !isMovingDown) {
-				direction = Direction.EAST;
-				race.getEastAnimation().update(delta);
-			}
-			if (race.getWestAnimation().getFrame() != 0) {
-				race.getWestAnimation().restart();
-			}
-		} else if (isMovingLeft) {
-			velX += -(0.1f) * delta;
-			if (velX < -1.2f)
-				velX = -1.2f;
-			if (!isMovingUp || !isMovingDown) {
-				direction = Direction.WEST;
-				race.getWestAnimation().update(delta);
-			}
-			if (race.getEastAnimation().getFrame() != 0) {
-				race.getEastAnimation().restart();
-			}
-		} else {
-			velX = 0;
+			direction = Direction.EAST;
+			race.getEastAnimation().update(delta);
 		}
 		
-		x += velX;
-		y += velY;
+		if (isMovingUp && isMovingRight) {
+			direction = Direction.NORTH_EAST;
+		}
+		
+		if (isMovingUp || isMovingUp && isMovingRight || isMovingUp && isMovingLeft) {
+			race.getNorthAnimation().update(delta);
+		}
+		
+		if (isMovingDown) {
+			direction = Direction.SOUTH;
+		} 
+		
+		if (isMovingDown && isMovingRight) {
+			direction = Direction.SOUTH_EAST;
+		}
+		
+		if (isMovingLeft) {
+			direction = Direction.WEST;
+			race.getWestAnimation().update(delta);
+		} 
+		
+		if (isMovingUp && isMovingLeft) {
+			direction = Direction.NORTH_WEST;
+		}
+		
+		if (isMovingDown && isMovingLeft) {
+			direction = Direction.SOUTH_WEST;
+		}
+		
+		if (isMovingDown || isMovingDown && isMovingRight || isMovingDown && isMovingLeft) {
+			race.getSouthAnimation().update(delta);
+		}
 		
 		bounds.setLocation(x, y);
 		
 		if (isMovingUp || isMovingDown || isMovingLeft || isMovingRight) {
 			if (hasSentMovingPacket)
 				hasSentMovingPacket = false;
-			NetworkManager.sendMovement(x, y, direction.getDirection(), true); 
+			NetworkManager.sendMovement(direction.getDirection(), true); 
 		} else {
 			if (!hasSentMovingPacket) {
 				race.getNorthAnimation().restart();
@@ -134,9 +137,14 @@ public class MobPlayer extends IMobPlayer {
 				race.getSouthAnimation().restart();
 				race.getWestAnimation().restart();
 				hasSentMovingPacket = true;
-				NetworkManager.sendMovement(x, y, direction.getDirection(), false);
+				NetworkManager.sendMovement(direction.getDirection(), false);
 			}
 			
 		}
+	}
+	
+	public void setNetworkPosition(float x, float y) {
+		this.x = x;
+		this.y = y;
 	}
 }

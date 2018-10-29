@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import wow.net.util.Logger;
 import wow.server.net.LogonConnection;
 import wow.server.net.WoWServer;
 import wow.server.net.WorldConnection;
@@ -31,10 +32,12 @@ public class DB {
 	private static DB Database;
 	private static Connection AuthenticationConnection;
 	private static Connection WorldConnection;
+	private static Connection CharacterConnection;
 	private static Properties Properties;
 	
 	private static String AuthenticationURL = "jdbc:mysql://%s:%s/%s";
 	private static String WorldURL = "jdbc:mysql://%s:%s/%s";
+	private static String CharsURL = "jdbc:mysql://%s:%s/%s";
 	
 	static {
 		Properties = new Properties();
@@ -44,6 +47,7 @@ public class DB {
 		
 		AuthenticationURL = String.format(AuthenticationURL, ServerConfiguration.getDatabaseHost(), ServerConfiguration.getDatabasePort(), ServerConfiguration.getAuthDatabase());
 		WorldURL = String.format(WorldURL, ServerConfiguration.getDatabaseHost(), ServerConfiguration.getDatabasePort(), ServerConfiguration.getWorldDatabase());
+		CharsURL = String.format(CharsURL, ServerConfiguration.getDatabaseHost(), ServerConfiguration.getDatabasePort(), ServerConfiguration.getCharacterDatabase());
 	}
 	
 	/**
@@ -59,8 +63,9 @@ public class DB {
 			try {
 				AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
 				WorldConnection = DriverManager.getConnection(WorldURL, Properties);
+				CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
 			} catch (SQLException ex) {
-				System.err.println(String.format("Unable to intialize a new MySQL instance: %s", ex.getMessage()));
+				Logger.write(String.format("Unable to initialize a new MySQL instance: %s", ex.getMessage()));
 			} finally {
 				closeQuietly();
 			}
@@ -97,7 +102,7 @@ public class DB {
 			}
 			return entities;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch entities: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to fetch entities: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -111,25 +116,25 @@ public class DB {
 	 * @return a list of used names
 	 */
 	public static ArrayList<String> loadUsedNames() {
-		String query = "SELECT user_name FROM auth_characters";
+		String query = "SELECT character_name FROM user_characters";
 		Statement statement = null;
 		ResultSet resultSet = null;
 		ArrayList<String> usedNames = new ArrayList<String>();
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
 			
-			statement = AuthenticationConnection.createStatement();
+			statement = CharacterConnection.createStatement();
 			resultSet = statement.executeQuery(query);
 			
 			while (resultSet.next()) {
-				String name = resultSet.getString("user_name");
+				String name = resultSet.getString("character_name");
 				usedNames.add(name);
 			}
 			
 			return usedNames;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to load entities: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to load used names: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -143,7 +148,7 @@ public class DB {
 	 * @return a list of banned names
 	 */
 	public static ArrayList<String> loadBannedNames() {
-		String query = "SELECT * FROM auth_banned_names";
+		String query = "SELECT character_name FROM auth_banned_names";
 		Statement statement = null;
 		ResultSet resultSet = null;
 		ArrayList<String> bannedNames = new ArrayList<String>();
@@ -155,13 +160,13 @@ public class DB {
 			resultSet = statement.executeQuery(query);
 			
 			while (resultSet.next()) {
-				String name = resultSet.getString("user_name");
+				String name = resultSet.getString("character_name");
 				bannedNames.add(name);
 			}
 			
 			return bannedNames;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to load entities: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to load banned names: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -173,25 +178,25 @@ public class DB {
 	/**
 	 * Attempt to add a character to the database.
 	 * @param user_id
-	 * @param user_name
+	 * @param character_name
 	 * @param realm_id
 	 */
-	public static void addCharacter(int user_id, String user_name, int realm_id) {
-		String query = String.format("INSERT INTO auth_characters (user_id, user_name, realm_id) VALUES (?, ?, ?)");
+	public static void addCharacter(int user_id, String character_name, int realm_id) {
+		String query = String.format("INSERT INTO user_characters (user_id, realm_id, character_name) VALUES (?, ?, ?)");
 		PreparedStatement statement = null;
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
-			statement = AuthenticationConnection.prepareStatement(query);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
+			statement = CharacterConnection.prepareStatement(query);
 			
 			statement.setInt(1, user_id);
-			statement.setString(2, user_name);
-			statement.setInt(3, realm_id);
+			statement.setInt(2, realm_id);
+			statement.setString(3, character_name);
 			statement.execute();
 			
-			System.out.println(String.format("Added character '%s' to Realm '%s'.", user_name, realm_id));
+			Logger.write(String.format("Added character '%s' to realm '%s'.", character_name, realm_id));
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch a user: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to add a character: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(statement);
 			closeQuietly();
@@ -202,27 +207,27 @@ public class DB {
 	/**
 	 * Attempt to delete a character from the database.
 	 * @param user_id
-	 * @param user_name
+	 * @param character_name
 	 * @param realm_id
 	 * @return true if deleted, false otherwise
 	 */
-	public static boolean deleteCharacter(int user_id, String user_name, int realm_id) {
-		String query = String.format("DELETE FROM auth_characters WHERE user_id = ? AND user_name = ? AND realm_id = ?");
+	public static boolean deleteCharacter(int user_id, String character_name, int realm_id) {
+		String query = String.format("DELETE FROM user_characters WHERE user_id = ? AND character_name = ? AND realm_id = ?");
 		PreparedStatement statement = null;
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
-			statement = AuthenticationConnection.prepareStatement(query);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
+			statement = CharacterConnection.prepareStatement(query);
 			
 			statement.setInt(1, user_id);
-			statement.setString(2, user_name);
+			statement.setString(2, character_name);
 			statement.setInt(3, realm_id);
 			statement.execute();
 			
-			System.out.println(String.format("Deleted character '%s' from Realm '%s'.", user_name, realm_id));
+			Logger.write(String.format("Deleted character '%s' from realm '%s'.", character_name, realm_id));
 			return true;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch a user: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to delete character: %s", ex.getMessage()));
 			return false;
 		} finally {
 			closeQuietly(statement);
@@ -235,12 +240,12 @@ public class DB {
 	 * @param worldConnection
 	 */
 	public static void saveCharacter(WorldConnection worldConnection) {
-		String query = String.format("UPDATE auth_characters SET x_position = ?, y_position = ?, direction = ? WHERE user_name = ?");
+		String query = String.format("UPDATE user_characters SET x_position = ?, y_position = ?, direction = ? WHERE character_name = ?");
 		PreparedStatement statement = null;
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
-			statement = AuthenticationConnection.prepareStatement(query);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
+			statement = CharacterConnection.prepareStatement(query);
 			
 			statement.setFloat(1, worldConnection.getX());
 			statement.setFloat(2, worldConnection.getY());
@@ -248,7 +253,7 @@ public class DB {
 			statement.setString(4, worldConnection.getCharacterName());
 			statement.execute();
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to save character: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to save character: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(statement);
 			closeQuietly();
@@ -262,14 +267,14 @@ public class DB {
 	 */
 	public static Vector2f getCharacterPosition(String characterName) {
 		Vector2f vector = null;
-		String query = String.format("SELECT x_position, y_position, direction FROM auth_characters WHERE user_name='%s'", characterName);
+		String query = String.format("SELECT x_position, y_position, direction FROM user_characters WHERE character_name='%s'", characterName);
 		Statement statement = null;
 		ResultSet resultSet = null;
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
 			
-			statement = AuthenticationConnection.createStatement();
+			statement = CharacterConnection.createStatement();
 			resultSet = statement.executeQuery(query);
 			
 			while (resultSet.next()) {
@@ -277,7 +282,7 @@ public class DB {
 			}
 			return vector;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch characer position: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to fetch character position: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -294,22 +299,22 @@ public class DB {
 	 */
 	public static LinkedList<String> getCharactersForUser(int user_id, int realm_id) {
 		LinkedList<String> chars = new LinkedList<String>();
-		String query = String.format("SELECT user_name FROM auth_characters WHERE user_id='%s' AND realm_id='%s'", user_id, realm_id);
+		String query = String.format("SELECT character_name FROM user_characters WHERE user_id='%s' AND realm_id='%s'", user_id, realm_id);
 		Statement statement = null;
 		ResultSet resultSet = null;
 		
 		try {
-			AuthenticationConnection = DriverManager.getConnection(AuthenticationURL, Properties);
+			CharacterConnection = DriverManager.getConnection(CharsURL, Properties);
 			
-			statement = AuthenticationConnection.createStatement();
+			statement = CharacterConnection.createStatement();
 			resultSet = statement.executeQuery(query);
 			
 			while (resultSet.next()) {
-				chars.add(resultSet.getString("user_name"));
+				chars.add(resultSet.getString("character_name"));
 			}
 			return chars;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch a character name: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to fetch characters: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -357,7 +362,7 @@ public class DB {
 				
 				return true;
 			} catch (SQLException ex) {
-				System.err.println(String.format("Unable to create account: %s", ex.getMessage()));
+				Logger.write(String.format("Unable to create account: %s", ex.getMessage()));
 			} finally {
 				closeQuietly(statement);
 				closeQuietly();
@@ -391,7 +396,7 @@ public class DB {
 				
 				return true;
 			} catch (SQLException ex) {
-				System.err.println(String.format("Unable to create realm: %s", ex.getMessage()));
+				Logger.write(String.format("Unable to create realm: %s", ex.getMessage()));
 			} finally {
 				closeQuietly(statement);
 				closeQuietly();
@@ -423,7 +428,7 @@ public class DB {
 				
 				return true;
 			} catch (SQLException ex) {
-				System.err.println(String.format("Unable to update account level: %s", ex.getMessage()));
+				Logger.write(String.format("Unable to update account level: %s", ex.getMessage()));
 			} finally {
 				closeQuietly(statement);
 				closeQuietly();
@@ -455,7 +460,7 @@ public class DB {
 			}
 			return false;
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to check account existence: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to check account existence: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -488,7 +493,7 @@ public class DB {
 			return false;
 		}
 		catch (SQLException ex) {
-			System.err.println(String.format("Unable to check realm existence: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to check realm existence: %s", ex.getMessage()));
 		}
 		finally {
 			closeQuietly(resultSet);
@@ -527,7 +532,7 @@ public class DB {
 					return null;
 			}
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch a user: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to create a logon connection: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -560,7 +565,7 @@ public class DB {
 				realms.add(new Realm(id, name, port));
 			}
 		} catch (SQLException ex) {
-			System.err.println(String.format("Unable to fetch a user: %s", ex.getMessage()));
+			Logger.write(String.format("Unable to fetch a list of realms: %s", ex.getMessage()));
 		} finally {
 			closeQuietly(resultSet);
 			closeQuietly(statement);
@@ -595,6 +600,8 @@ public class DB {
 			try { AuthenticationConnection.close(); } catch (Exception e) {}
 		if (WorldConnection != null)
 			try { WorldConnection.close(); } catch (Exception e) {}
+		if (CharacterConnection != null) 
+			try { CharacterConnection.close(); } catch (Exception e) {}
 	}
 	
 	/**
