@@ -67,7 +67,7 @@ public class State0Login extends BasicGameState {
 		rememberCheckbox = new GuiCheckbox(container, "Remember Account Name");
 		rememberCheckbox.setLocation(25, container.getHeight() - 100);
 		
-		rememberCheckbox.setToggled(SettingsConfiguration.getRememberAccount());
+		rememberCheckbox.setToggled(SettingsConfiguration.shouldRememberAccount());
 		if (rememberCheckbox.isToggled()) {
 			textfield_AccountName.setText(SettingsConfiguration.getAccount());
 			textfield_AccountPassword.setFocus(true);
@@ -119,7 +119,7 @@ public class State0Login extends BasicGameState {
 		if (!lastRealm.equalsIgnoreCase("null"))
 			label_LastRealm = lastRealm;
 		
-		if (SettingsConfiguration.getRememberAccount()) {
+		if (SettingsConfiguration.shouldRememberAccount()) {
 			if (!isRememberedAccountSet) {
 				textfield_AccountName.setText(SettingsConfiguration.getAccount());
 				isRememberedAccountSet = true;

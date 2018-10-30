@@ -115,9 +115,10 @@ public class WorldConnection {
 					boolean isMoving = ((PacketMovementToAll)object).isMoving;
 					NetworkManager.updatePlayerMPLocation(x, y, characterName, direction, isMoving);
 				} else if (object instanceof PacketChatMessageToAll) {
+					String tag = ((PacketChatMessageToAll)object).Tag;
 					String username = ((PacketChatMessageToAll)object).Username;
 					String message = ((PacketChatMessageToAll)object).ChatMessage;
-					NetworkManager.addChatMessage(new ChatMessage(username, message));
+					NetworkManager.addChatMessage(new ChatMessage(tag, username, message));
 				} else if (object instanceof PacketGMUpdate) {
 					String username = ((PacketGMUpdate)object).Name;
 					boolean isGM = ((PacketGMUpdate)object).isGM;

@@ -21,6 +21,7 @@ public class GuiOptionsInterface {
 	private Rectangle optionsUi;
 	private GuiCheckbox myNameCheckbox;
 	private GuiCheckbox playerNamesCheckbox;
+	private GuiCheckbox mobNamesCheckbox;
 	private GuiOptionsButton okayButton;
 	
 	private boolean isVisible = false;
@@ -41,6 +42,10 @@ public class GuiOptionsInterface {
 		playerNamesCheckbox.setLocation(optionsUi.getLocation().x + 10, optionsUi.getLocation().y + 95);
 		playerNamesCheckbox.setToggled(SettingsConfiguration.shouldRenderPlayerNames());
 		
+		mobNamesCheckbox = new GuiCheckbox(container, "Mob names");
+		mobNamesCheckbox.setLocation(optionsUi.getLocation().x + 10, optionsUi.getLocation().y + 115);
+		mobNamesCheckbox.setToggled(SettingsConfiguration.shouldRenderMobNames());
+		
 		okayButton = new GuiOptionsButton("Okay", new ButtonActionConfirmInterfaceOptions());
 		okayButton.setLocation(optionsUi.getLocation().x + 25, optionsUi.getLocation().y + optionsUi.getHeight() - okayButton.getHeight() - 10);
 	}
@@ -59,6 +64,7 @@ public class GuiOptionsInterface {
 			graphics.drawString(optionTypes[0], optionsUi.getLocation().x + 10, optionsUi.getLocation().y + 50);
 			myNameCheckbox.render(container, sbg, graphics);
 			playerNamesCheckbox.render(container, sbg, graphics);
+			mobNamesCheckbox.render(container, sbg, graphics);
 			
 			graphics.setColor(Color.white);
 			okayButton.render(container, sbg, graphics);
@@ -69,6 +75,7 @@ public class GuiOptionsInterface {
 		if (isVisible) {
 			myNameCheckbox.update(container, sbg);
 			playerNamesCheckbox.update(container, sbg);
+			mobNamesCheckbox.update(container, sbg);
 			okayButton.update(container, sbg, delta);
 		}
 	}
@@ -87,5 +94,9 @@ public class GuiOptionsInterface {
 	
 	public boolean shouldRenderPlayerNames() {
 		return playerNamesCheckbox.isToggled();
+	}
+	
+	public boolean shouldRenderMobNames() {
+		return mobNamesCheckbox.isToggled();
 	}
 }

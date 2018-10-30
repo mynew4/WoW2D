@@ -22,7 +22,8 @@ public class SettingsConfiguration {
 		RememberAccount,
 		AccountName,
 		RenderMyName,
-		RenderPlayerNames
+		RenderPlayerNames,
+		RenderMobNames
 	}
 
 	private static final File configFile = new File("resources/client.conf");
@@ -54,6 +55,7 @@ public class SettingsConfiguration {
 					keyValues.put(Keys.AccountName, dataSplit[2]);
 					keyValues.put(Keys.RenderMyName, dataSplit[3]);
 					keyValues.put(Keys.RenderPlayerNames, dataSplit[4]);
+					keyValues.put(Keys.RenderMobNames, dataSplit[5]);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -82,7 +84,8 @@ public class SettingsConfiguration {
 		buffer.append(keyValues.get(Keys.RememberAccount)+";");
 		buffer.append(keyValues.get(Keys.AccountName)+";");
 		buffer.append(keyValues.get(Keys.RenderMyName)+";");
-		buffer.append(keyValues.get(Keys.RenderPlayerNames));
+		buffer.append(keyValues.get(Keys.RenderPlayerNames)+";");
+		buffer.append(keyValues.get(Keys.RenderMobNames));
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
 			bw.write(buffer.toString());
@@ -108,7 +111,7 @@ public class SettingsConfiguration {
 	 * Get the value pointing to whether or not we should remember the account name.
 	 * @return the remember account value
 	 */
-	public static boolean getRememberAccount() {
+	public static boolean shouldRememberAccount() {
 		return Boolean.valueOf(keyValues.get(Keys.RememberAccount));
 	}
 	
@@ -134,5 +137,9 @@ public class SettingsConfiguration {
 	 */
 	public static boolean shouldRenderPlayerNames() {
 		return Boolean.valueOf(keyValues.get(Keys.RenderPlayerNames));
+	}
+	
+	public static boolean shouldRenderMobNames() {
+		return Boolean.valueOf(keyValues.get(Keys.RenderMobNames));
 	}
 }

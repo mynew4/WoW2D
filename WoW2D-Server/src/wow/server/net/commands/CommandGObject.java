@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Server;
 import wow.net.packet.world.PacketChatMessageToAll;
 import wow.net.packet.world.PacketGObject;
 import wow.server.net.WorldConnection;
+import wow.server.net.WorldConnection.AccountLevel;
 import wow.server.net.game.object.entity.EntityInstance;
 import wow.server.util.manager.EntityManager;
 
@@ -19,7 +20,7 @@ public class CommandGObject extends AbstractCommand {
 	private final String ACTION_ADD = "add";
 
 	public CommandGObject() {
-		super("gobject");
+		super("gobject", AccountLevel.Administrator);
 	}
 
 	@Override
@@ -42,7 +43,8 @@ public class CommandGObject extends AbstractCommand {
 				server.sendToAllTCP(pGameObject);
 			} else {
 				PacketChatMessageToAll pError = new PacketChatMessageToAll();
-				pError.Username = "server";
+				pError.Tag = "server";
+				pError.Username = null;
 				pError.ChatMessage = "Invalid entity_id specified.";
 				server.sendToTCP(worldConnection.getConnectionId(), pError);
 			}

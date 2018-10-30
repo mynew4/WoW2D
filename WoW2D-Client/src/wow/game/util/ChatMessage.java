@@ -7,12 +7,18 @@ package wow.game.util;
  */
 public class ChatMessage {
 
+	private String tag;
 	private String username;
 	private String message;
 	
-	public ChatMessage(String username, String message) {
+	public ChatMessage(String tag, String username, String message) {
+		this.tag = tag;
 		this.username = username;
 		this.message = message;
+	}
+	
+	public String getTag() {
+		return tag;
 	}
 	
 	public String getUsername() {

@@ -10,6 +10,7 @@ import org.newdawn.slick.geom.Rectangle;
 import wow.game.WoW;
 import wow.game.objects.mob.player.IMobPlayer.Direction;
 import wow.game.util.ImageConverter;
+import wow.game.util.SettingsConfiguration;
 
 /**
  * Creates an instance of a given entity-id.
@@ -60,7 +61,8 @@ public class EntityInstance {
 			}
 		}
 		graphics.setColor(Color.yellow); // TODO: change based on passive/aggressive status
-		graphics.drawString(name, (bounds.getX() + (bounds.getWidth() / 2 - graphics.getFont().getWidth(name) / 2)), bounds.getY() - graphics.getFont().getLineHeight());
+		if (SettingsConfiguration.shouldRenderMobNames())
+			graphics.drawString(name, (bounds.getX() + (bounds.getWidth() / 2 - graphics.getFont().getWidth(name) / 2)), bounds.getY() - graphics.getFont().getLineHeight());
 		graphics.drawImage(img, x, y);
 	}
 	

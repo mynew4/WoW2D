@@ -38,45 +38,37 @@ public class PacketHandlerChat extends IPacketHandler {
 		}
 	}
 	
-	// TODO: Condense all commands into one arraylist and check command level against user leve,.
 	private void parseCommand(String message, WorldConnection worldConnection, Server server, Connection connection) {
-		message = message.substring(1).toLowerCase();
+		message = message.substring(1);
 		String[] cmdParts = message.split(" ");
 		String cmd = cmdParts[0];
-		switch (worldConnection.getAccountLevel()) {
-		case Administrator:
-			for (int i = 0; i < WoWServer.getAdministratorCommands().size(); i++) {
-				AbstractCommand command = WoWServer.getAdministratorCommands().get(i);
-				if (command.getPrefix().equalsIgnoreCase(cmd)) {
+		
+		ArrayList<AbstractCommand> commands = WoWServer.getUserCommands();
+		for (int i = 0; i < commands.size(); i++) {
+			AbstractCommand command = commands.get(i);
+			if (command.getPrefix().equalsIgnoreCase(cmd)) {
+				if (worldConnection.getAccountLevel().getLevelId() >= command.getLevel().getLevelId()) {
 					command.performCommand(server, connection, worldConnection, cmdParts);
+				} else {
+					PacketChatMessageToAll pError = new PacketChatMessageToAll();
+					pError.Tag = "server";
+					pError.Username = null;
+					pError.ChatMessage = "Incorrect account level.";
+					server.sendToTCP(worldConnection.getConnectionId(), pError);
 				}
 			}
-			break;
-		case Gamemaster:
-			for (int i = 0; i < WoWServer.getGamemasterCommands().size(); i++) {
-				AbstractCommand command = WoWServer.getGamemasterCommands().get(i);
-				if (command.getPrefix().equalsIgnoreCase(cmd)) {
-					command.performCommand(server, connection, worldConnection, cmdParts);
-				}
-			}
-			break;
-		case Moderator:
-			for (int i = 0; i < WoWServer.getModeratorCommands().size(); i++) {
-				AbstractCommand command = WoWServer.getModeratorCommands().get(i);
-				if (command.getPrefix().equalsIgnoreCase(cmd)) {
-					command.performCommand(server, connection, worldConnection, cmdParts);
-				}
-			}
-			break;
-		case Player:
-			sendChatMessage(server, message, worldConnection);
-			break;
 		}
 	}
 	
 	private void sendChatMessage(Server server, String message, WorldConnection worldConnection) {
+		String username = worldConnection.getCharacterName();
+		boolean isGM = worldConnection.isGM();
 		pChatMessageToAll = new PacketChatMessageToAll();
-		pChatMessageToAll.Username = worldConnection.getCharacterName();
+		if (isGM)
+			pChatMessageToAll.Tag = "GM";
+		else
+			pChatMessageToAll.Tag = "player";
+		pChatMessageToAll.Username = username;
 		pChatMessageToAll.ChatMessage = message;
 		server.sendToAllTCP(pChatMessageToAll);
 	}

@@ -52,7 +52,8 @@ public class PacketHandlerWorldEnterRequest extends IPacketHandler {
 			WoWServer.addPlayerToGUI(characterName);
 			
 			pMotd = new PacketChatMessageToAll();
-			pMotd.Username = "Server";
+			pMotd.Tag = "server";
+			pMotd.Username = null;
 			pMotd.ChatMessage = WoWServer.getMOTD();
 			connection.sendTCP(pMotd);
 			

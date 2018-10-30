@@ -64,22 +64,13 @@ public class WoWServer {
 	
 	private static ServerGUI serverGui;
 	
-	private static ArrayList<AbstractCommand> PlayerCommands = new ArrayList<AbstractCommand>();
-	private static ArrayList<AbstractCommand> ModeratorCommands = new ArrayList<AbstractCommand>();
-	private static ArrayList<AbstractCommand> GamemasterCommands = new ArrayList<AbstractCommand>();
-	private static ArrayList<AbstractCommand> AdministratorCommands = new ArrayList<AbstractCommand>();
-	
+	private static ArrayList<AbstractCommand> Commands = new ArrayList<AbstractCommand>();
 	private static ArrayList<String> BannedNames = new ArrayList<String>();
 	private static ArrayList<String> UsedNames = new ArrayList<String>();
 	
 	static {
-		ModeratorCommands.add(new CommandGM());
-		
-		GamemasterCommands.add(new CommandGM());
-		GamemasterCommands.add(new CommandGObject());
-		
-		AdministratorCommands.add(new CommandGM());
-		AdministratorCommands.add(new CommandGObject());
+		Commands.add(new CommandGM());
+		Commands.add(new CommandGObject());
 	}
 	
 	public WoWServer() {	
@@ -456,20 +447,8 @@ public class WoWServer {
 		return ServerConfiguration.getMOTD();
 	}
 	
-	public static ArrayList<AbstractCommand> getPlayerCommands() {
-		return PlayerCommands;
-	}
-
-	public static ArrayList<AbstractCommand> getModeratorCommands() {
-		return ModeratorCommands;
-	}
-
-	public static ArrayList<AbstractCommand> getGamemasterCommands() {
-		return GamemasterCommands;
-	}
-
-	public static ArrayList<AbstractCommand> getAdministratorCommands() {
-		return AdministratorCommands;
+	public static ArrayList<AbstractCommand> getUserCommands() {
+		return Commands;
 	}
 	
 	/**

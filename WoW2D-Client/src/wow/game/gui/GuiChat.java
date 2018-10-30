@@ -68,18 +68,33 @@ public class GuiChat {
 		if (messages.size() > 0) {
 			for (int i = 0; i < messages.size(); i++) {
 				ChatMessage message = messages.get(i);
-				if (message.getUsername().equalsIgnoreCase("server"))
+				String username = message.getUsername();
+				String displayableMessage = null;
+				if (message.getTag().equalsIgnoreCase("server"))
 					graphics.setColor(Color.yellow);
 				else
 					graphics.setColor(Color.white);
-				if (i == 0) {
-					graphics.drawString(String.format("[%s] %s", message.getUsername(), message.getMessage()), chatLog.getLocation().x, chatLog.getLocation().y);
+				
+				if (username == null) {
+					displayableMessage = message.getMessage();
 				} else {
-					graphics.drawString(String.format("[%s] %s", message.getUsername(), message.getMessage()), chatLog.getLocation().x, chatLog.getLocation().y + graphics.getFont().getLineHeight() * i);
+					if (!message.getTag().equalsIgnoreCase("server") && !message.getTag().equalsIgnoreCase("player")) {
+						displayableMessage = String.format("[%s][%s] %s", message.getTag(), username, message.getMessage());
+					}
+					
+					if (message.getTag().equalsIgnoreCase("player")) {
+						displayableMessage = String.format("[%s] %s", username, message.getMessage());
+					}
+				}
+				
+				if (i == 0) {
+					graphics.drawString(displayableMessage, chatLog.getLocation().x, chatLog.getLocation().y);
+				} else {
+					graphics.drawString(displayableMessage, chatLog.getLocation().x, chatLog.getLocation().y + graphics.getFont().getLineHeight() * i);
 				}
 				
 				if (message == messages.getLast()) {
-					Rectangle r = new Rectangle(chatLog.getLocation().x, chatLog.getLocation().y + graphics.getFont().getLineHeight() * i, graphics.getFont().getWidth(String.format("[%s] %s", message.getUsername(), message.getMessage())), graphics.getFont().getLineHeight());
+					Rectangle r = new Rectangle(chatLog.getLocation().x, chatLog.getLocation().y + graphics.getFont().getLineHeight() * i, graphics.getFont().getWidth(displayableMessage), graphics.getFont().getLineHeight());
 					
 					if (r.getY() + r.getHeight() - chatLog.getLocation().getY() > chatLog.getHeight()) {
 						messages.removeFirst();

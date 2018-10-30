@@ -7,6 +7,7 @@ package wow.net.packet.world;
  */
 public class PacketChatMessageToAll {
 
+	public String Tag;
 	public String Username;
 	public String ChatMessage;
 }

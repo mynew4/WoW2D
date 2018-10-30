@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Server;
 
 import wow.net.packet.world.PacketGMUpdate;
 import wow.server.net.WorldConnection;
+import wow.server.net.WorldConnection.AccountLevel;
 
 /**
  * Handles setting gm status.
@@ -14,7 +15,7 @@ import wow.server.net.WorldConnection;
 public class CommandGM extends AbstractCommand {
 
 	public CommandGM() {
-		super("gm");
+		super("gm", AccountLevel.Gamemaster);
 	}
 
 	@Override

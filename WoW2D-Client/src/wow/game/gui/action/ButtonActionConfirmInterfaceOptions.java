@@ -22,9 +22,11 @@ public class ButtonActionConfirmInterfaceOptions extends IAction {
 		
 		boolean shouldRenderMyName = interfaceUi.shouldRenderMyName();
 		boolean shouldRenderPlayerNames = interfaceUi.shouldRenderPlayerNames();
+		boolean shouldRenderMobNames = interfaceUi.shouldRenderMobNames();
 				
 		SettingsConfiguration.setSettingValue(Keys.RenderMyName, shouldRenderMyName);
 		SettingsConfiguration.setSettingValue(Keys.RenderPlayerNames, shouldRenderPlayerNames);
+		SettingsConfiguration.setSettingValue(Keys.RenderMobNames, shouldRenderMobNames);
 		
 		game.getOptionsGui().setInterfaceOptionsVisible(false);
 	}
